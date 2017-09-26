@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="4.8.4 -mcpu=cortex-m0 -mthumb -g -nostartfiles -Map=STM32F0-OV7670DMA.map -O0 --gc-sections -LD:\CooCox\CoIDE\configuration\ProgramData\STM32F0-OV7670DMA -TD:\CooCox\CoIDE\configuration\ProgramData\STM32F0-OV7670DMA/arm-gcc-link.ld -g">
+      <target file="STM32F0-OV7670DMA.elf" lastModified="15ebfda2b96">
+         <source file="..\obj\stm32f0xx_rcc.o" lastModified="15ebf551a49"/>
+         <source file="..\obj\ILI9163.o" lastModified="15ebfb9b549"/>
+         <source file="..\obj\main.o" lastModified="15ebfda298b"/>
+         <source file="..\obj\startup_stm32f0xx.o" lastModified="15ebf551bb6"/>
+         <source file="..\obj\stm32f0xx_dma.o" lastModified="15ebf551c24"/>
+         <source file="..\obj\stm32f0xx_spi.o" lastModified="15ebf551c98"/>
+         <source file="..\obj\system_stm32f0xx_temp.o" lastModified="15ebf551ce9"/>
+         <source file="..\obj\stm32f0xx_gpio.o" lastModified="15ebf551d42"/>
+         <source file="..\obj\stm32f0xx_tim.o" lastModified="15ebf551df7"/>
+         <source file="..\obj\stm32f0xx_exti.o" lastModified="15ebf551e64"/>
+         <source file="..\obj\stm32f0xx_misc.o" lastModified="15ebf551ec4"/>
+      </target>
+   </processor>
+</history>

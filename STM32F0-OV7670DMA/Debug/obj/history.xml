@@ -1,0 +1,44 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<history>
+   <processor signature="arm-none-eabi-gcc 4.9.2 mingw32 -mcpu=cortex-m0 -mthumb -Wall -ffunction-sections -g -O0 -c -DSTM32F051R8 -DSTM32F0XX_MD -DUSE_STDPERIPH_DRIVER -D__ASSEMBLY__ -I..\..\..\workspace\STM32F0-OV7670DMA\stm32_lib\inc -I..\..\..\workspace\STM32F0-OV7670DMA\cmsis_core -I..\..\.. -I..\..\..\workspace\STM32F0-OV7670DMA\cmsis_boot -I..\..\..\workspace\STM32F0-OV7670DMA -I..\..\..\workspace -I..\..\..\workspace\STM32F0-OV7670DMA\stm32_lib">
+      <target file="stm32f0xx_spi.o" lastModified="15ebf551c98">
+         <source file="..\..\..\stm32_lib\src\stm32f0xx_spi.c" lastModified="15eba2b8e94"/>
+      </target>
+      <target file="HFunc.o" lastModified="15ebaa1ec06">
+         <source file="..\..\..\HFunc.c" lastModified="154501fc520"/>
+      </target>
+      <target file="GFXC.o" lastModified="15ebaa2ec5a">
+         <source file="..\..\..\GFXC.c" lastModified="15ebaa2e6a9"/>
+      </target>
+      <target file="stm32f0xx_gpio.o" lastModified="15ebf551d42">
+         <source file="..\..\..\stm32_lib\src\stm32f0xx_gpio.c" lastModified="15eba14ff73"/>
+      </target>
+      <target file="stm32f0xx_rcc.o" lastModified="15ebf551a49">
+         <source file="..\..\..\stm32_lib\src\stm32f0xx_rcc.c" lastModified="15eba14f4c3"/>
+      </target>
+      <target file="stm32f0xx_dma.o" lastModified="15ebf551c24">
+         <source file="..\..\..\stm32_lib\src\stm32f0xx_dma.c" lastModified="15eba14f4bd"/>
+      </target>
+      <target file="stm32f0xx_misc.o" lastModified="15ebf551ec4">
+         <source file="..\..\..\stm32_lib\src\stm32f0xx_misc.c" lastModified="15eba150f75"/>
+      </target>
+      <target file="main.o" lastModified="15ebfda298b">
+         <source file="..\..\..\main.c" lastModified="15ebfda18b0"/>
+      </target>
+      <target file="stm32f0xx_tim.o" lastModified="15ebf551df7">
+         <source file="..\..\..\stm32_lib\src\stm32f0xx_tim.c" lastModified="15eba14ff67"/>
+      </target>
+      <target file="stm32f0xx_exti.o" lastModified="15ebf551e64">
+         <source file="..\..\..\stm32_lib\src\stm32f0xx_exti.c" lastModified="15eba1516bc"/>
+      </target>
+      <target file="startup_stm32f0xx.o" lastModified="15ebf551bb6">
+         <source file="..\..\..\cmsis_boot\startup\startup_stm32f0xx.s" lastModified="15eba14f4c7"/>
+      </target>
+      <target file="system_stm32f0xx_temp.o" lastModified="15ebf551ce9">
+         <source file="..\..\..\cmsis_boot\system_stm32f0xx_temp.c" lastModified="15eba14f4cb"/>
+      </target>
+      <target file="ILI9163.o" lastModified="15ebfb9b549">
+         <source file="..\..\..\ILI9163.c" lastModified="15ebfb9b2f2"/>
+      </target>
+   </processor>
+</history>
