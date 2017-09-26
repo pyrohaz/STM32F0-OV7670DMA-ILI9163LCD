@@ -3,6 +3,7 @@
 GPIO_InitTypeDef G;
 SPI_InitTypeDef S;
 
+//Send byte
 void SB(uint8_t data, RegData rd){
 	GPIO_ResetBits(G_CS, P_CS);
 
@@ -15,6 +16,7 @@ void SB(uint8_t data, RegData rd){
 	GPIO_SetBits(G_CS, P_CS);
 }
 
+//Send word
 void SW(uint16_t data, RegData rd){
 	GPIO_ResetBits(G_CS, P_CS);
 
@@ -29,6 +31,7 @@ void SW(uint16_t data, RegData rd){
 	GPIO_SetBits(G_CS, P_CS);
 }
 
+//Set memory address range
 void SetAddr(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
 	SB(0x2A, Reg);
 	SB(0x00, Dat);
@@ -45,6 +48,7 @@ void SetAddr(uint8_t x1, uint8_t y1, uint8_t x2, uint8_t y2){
 	SB(0x2C, Reg);
 }
 
+//Initialize LCD
 void ILI_Init(void){
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
@@ -59,6 +63,7 @@ void ILI_Init(void){
 	G.GPIO_Pin = P_CS;
 	GPIO_Init(G_CS, &G);
 
+	//SPI!
 	G.GPIO_Pin = GPIO_Pin_13 | GPIO_Pin_15;
 	G.GPIO_Mode = GPIO_Mode_AF;
 	GPIO_Init(GPIOB, &G);
@@ -117,6 +122,8 @@ void ILI_Init(void){
 
 	SB(0x29, Reg); //Display on
 	SB(0x36, Reg); //Set Memory access mode
+
+	//LCD rotate... (probably a bit wrong)
 	SB(0x60|(0<<3), Dat);
 }
 

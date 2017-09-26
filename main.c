@@ -13,20 +13,23 @@ TIM_OCInitTypeDef TO;
 DMA_InitTypeDef D;
 SPI_InitTypeDef S;
 
+//Camera SCB pins
 #define C_IGPIO		GPIOC
 #define C_SCL		GPIO_Pin_13
 #define C_SDA		GPIO_Pin_15
-
-#define P_VSYNC		GPIO_Pin_14
-#define G_VSYNC		GPIOC
-#define P_HREF		GPIO_Pin_0
-#define G_HREF		GPIOC
 
 #define C_OVADDR	(0x42)
 
 #define I_DLYL	10
 #define I_DLYS	5
 
+//VSync and Href pins
+#define P_VSYNC		GPIO_Pin_14
+#define G_VSYNC		GPIOC
+#define P_HREF		GPIO_Pin_0
+#define G_HREF		GPIOC
+
+//SysTick stuffs
 volatile uint32_t msec = 0;
 
 void Delay(uint32_t t){
@@ -40,8 +43,7 @@ void SysTick_Handler(void){
 
 /*
  *
- * The bit banged I2C is NOT my implementation. I ported it from the same files as "Sensor_config.h" as I couldn't
- * manage to get the actual I2C on the STM32 to work.
+ * The bit banged I2C is NOT my implementation. I ported it from an STM32 based OV7670 project I found online.
  *
  */
 void Delayus(uint32_t D){
@@ -197,6 +199,7 @@ uint8_t C_Init(void){
 
 int main(void)
 {
+	//48MHz clock (overclocking can be done by increasing PLLMul! Do at your own risk ;)
 	RCC_SYSCLKConfig(RCC_SYSCLKSource_HSI);
 	RCC_PLLCmd(DISABLE);
 	RCC_PLLConfig(RCC_PLLSource_HSI_Div2, RCC_PLLMul_12);
@@ -204,6 +207,7 @@ int main(void)
 	while(!RCC_GetFlagStatus(RCC_FLAG_PLLRDY));
 	RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
 
+	//Clock enabling...
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOA, ENABLE);
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOB, ENABLE);
 	RCC_AHBPeriphClockCmd(RCC_AHBPeriph_GPIOC, ENABLE);
@@ -212,6 +216,7 @@ int main(void)
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2, ENABLE);
 	RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
 
+	//PA8, TIM1 IC1
 	G.GPIO_Pin = GPIO_Pin_8;
 	G.GPIO_Mode = GPIO_Mode_AF;
 	G.GPIO_OType = GPIO_OType_PP;
@@ -219,27 +224,33 @@ int main(void)
 	G.GPIO_Speed = GPIO_Speed_Level_1;
 	GPIO_Init(GPIOA, &G);
 
+	//PB2, TIM2 OC2
 	G.GPIO_Pin = GPIO_Pin_3;
 	GPIO_Init(GPIOB, &G);
 
 	GPIO_PinAFConfig(GPIOA, GPIO_PinSource8, GPIO_AF_2);
 	GPIO_PinAFConfig(GPIOB, GPIO_PinSource3, GPIO_AF_2);
 
+	//PA0-PA7, OV7670 data output
 	G.GPIO_Pin = GPIO_Pin_0|GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_7;
 	G.GPIO_Mode = GPIO_Mode_IN;
 	GPIO_Init(GPIOA, &G);
 
+	//VSYNC
 	G.GPIO_Pin = P_VSYNC;
 	GPIO_Init(G_VSYNC, &G);
 
+	//HREF
 	G.GPIO_Pin = P_HREF;
 	GPIO_Init(G_HREF, &G);
 
+	//SCB
 	G.GPIO_Pin = C_SCL | C_SDA;
 	G.GPIO_OType = GPIO_OType_OD;
 	G.GPIO_Mode = GPIO_Mode_OUT;
 	GPIO_Init(C_IGPIO, &G);
 
+	//Timer 1 config
 	TB.TIM_ClockDivision = TIM_CKD_DIV1;
 	TB.TIM_CounterMode = TIM_CounterMode_Up;
 	TB.TIM_Period = 0xFF;
@@ -247,6 +258,7 @@ int main(void)
 	TB.TIM_RepetitionCounter = 0;
 	TIM_TimeBaseInit(TIM1, &TB);
 
+	//Timer 2 config
 	TB.TIM_ClockDivision = TIM_CKD_DIV1;
 	TB.TIM_CounterMode = TIM_CounterMode_Up;
 	TB.TIM_Period = 1;
@@ -254,6 +266,7 @@ int main(void)
 	TB.TIM_RepetitionCounter = 0;
 	TIM_TimeBaseInit(TIM2, &TB);
 
+	//Timer 2 toggle output (output 12MHz clock)
 	TO.TIM_OCIdleState = TIM_OCIdleState_Set;
 	TO.TIM_OCMode = TIM_OCMode_Toggle;
 	TO.TIM_OCPolarity = TIM_OCPolarity_High;
@@ -262,6 +275,7 @@ int main(void)
 	TIM_OC2Init(TIM2, &TO);
 	TIM_Cmd(TIM2, ENABLE);
 
+	//Timer 1 input capture (DMA trigger)
 	TI.TIM_Channel = TIM_Channel_1;
 	TI.TIM_ICFilter = 0;
 	TI.TIM_ICPolarity = TIM_ICPolarity_Rising;
@@ -271,6 +285,7 @@ int main(void)
 	TIM_DMACmd(TIM1, TIM_DMA_CC1, ENABLE);
 	TIM_Cmd(TIM1, ENABLE);
 
+	//DMA Config
 	D.DMA_BufferSize = 1;
 	D.DMA_DIR = DMA_DIR_PeripheralDST;
 	D.DMA_M2M = DMA_M2M_Disable;
@@ -284,12 +299,16 @@ int main(void)
 	D.DMA_Priority = DMA_Priority_VeryHigh;
 	DMA_Init(DMA1_Channel2, &D);
 
+	//Enable Systick
 	SysTick_Config(SystemCoreClock/1000);
 
+	//Camera initialization
 	while(!C_Init());
 
+	//LCD initialization
 	ILI_Init();
 
+	//Disable Systick
 	SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Pos;
 
 	int x,y;
@@ -297,8 +316,10 @@ int main(void)
 	uint32_t mso = 0, a = 0, b = 0;
 	int row = 0;
 
+	//Set address to bottom of LCD
 	SetAddr(0,120,160-1,128-1);
 
+	//Set all pixels in range to zero
 	for(y = 0; y<8; y++){
 		for(x = 0; x<160; x++){
 			SW(0,Dat);
@@ -306,26 +327,40 @@ int main(void)
 	}
 
 
+	//Wait for frame blanking!
 	while(!GPIO_ReadInputDataBit(G_VSYNC, P_VSYNC));
+
+	//Enable DMA
 	DMA_Cmd(DMA1_Channel2, ENABLE);
 
+	//These settings were for entire frame capture and didn't work
 	/*SetAddr(0,0,160-1,120-1);
 	GPIO_ResetBits(G_CS, P_CS);
 	GPIO_SetBits(G_AO, P_AO);*/
 
 	while(1)
 	{
+		//Wait for blanking to end
 		while(GPIO_ReadInputDataBit(G_VSYNC, P_VSYNC));
 
+		//Capture all rows
 		for(row = 0; row<120; row++){
+			//Ensure SPI isn't busy
 			while(SPI_I2S_GetFlagStatus(SPI2, SPI_I2S_FLAG_BSY));
+			//Set current LCD memory address range to row
 			SetAddr(0,row,160-1,row);
+
+			//Enable LCD and set transfer location to memory (not reg)
 			GPIO_ResetBits(G_CS, P_CS);
 			GPIO_SetBits(G_AO, P_AO);
+
+			//Wait for line to finish
 			while(!GPIO_ReadInputDataBit(G_HREF, P_HREF));
+			//Wait for blanking to finish
 			while(GPIO_ReadInputDataBit(G_HREF, P_HREF));
 		}
 
+		//Wait for frame to finish
 		while(!GPIO_ReadInputDataBit(G_VSYNC, P_VSYNC));
 	}
 }
